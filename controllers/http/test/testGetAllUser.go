@@ -13,6 +13,8 @@ import (
 )
 
 func TestGetAllUser(c *fiber.Ctx) error {
+	// token := c.Cookies("token")
+	// log.Printf("Token cookie: %s\n", token)
 	prismaDB := dbClient.GetPrismaDBClient()
 	ctx := context.Background()
 

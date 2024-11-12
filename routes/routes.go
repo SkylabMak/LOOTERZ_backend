@@ -12,6 +12,7 @@ func SetupRoutes(app *fiber.App) {
 	app.Post("/testGetAllUser", httpTest.TestGetAllUser)   // HTTP endpoint for user creation
 	app.Post("/testGetAllUserGROM", httpTest.TestGetAllUser)   // HTTP endpoint for user creation
 
+	//Each WebSocket handler runs as a goroutine by default because Fiber
 	//socket
-	app.Get("/ws", websocket.New(socketTest.WebSocketHandler))
+	app.Get("/ws/:roomID", websocket.New(socketTest.WebSocketHandler))
 }

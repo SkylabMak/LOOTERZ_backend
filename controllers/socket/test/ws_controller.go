@@ -1,63 +1,72 @@
-// ws_controller.go
+// controllers/socket/ws_controller.go
 package socketTest
 
 import (
-	"encoding/json"
 	"go-websocket-fiber/models/types"
+	"go-websocket-fiber/services/socket"
 	"log"
-	"math/rand"
 	"time"
 
 	"github.com/gofiber/websocket/v2"
 )
 
-// Handler manages WebSocket connections
 func WebSocketHandler(c *websocket.Conn) {
-	log.Println("socket run")
-	// Close the WebSocket connection when the function ends
-	defer c.Close()
+	roomID := c.Params("roomID")
+	token := c.Cookies("token")
+	log.Printf("Token cookie: %s\n", token)
+	userID := token // Assuming userID is derived from the token
+	log.Printf("User %s joined room: %s\n", userID, roomID)
 
-	// Create a ticker that ticks every 5 seconds
+	// Get the singleton instance of RoomManager
+	roomManager := socket.GetRoomManager()
+
+	// Add the connection for the user in the room
+	roomManager.AddConnection(roomID, userID, c)
+
+	// Channel to signal when the connection is closed
+	done := make(chan struct{})
+
+	// Start a goroutine to listen for disconnections
+	go func() {
+		defer close(done) // Close the done channel when the goroutine ends
+
+		for {
+			// Listen for messages to detect disconnection
+			if _, _, err := c.ReadMessage(); err != nil {
+				log.Println("Read error or client disconnected:", err)
+				roomManager.RemoveConnection(roomID, userID)
+				break // Exit the loop on error, which will trigger the done channel
+			}
+		}
+	}()
+
+	// Periodic broadcast loop, which stops when done is signaled
 	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
 
-	// Use a for range loop to iterate over the ticker.C channel
-	for range ticker.C {
-		// Generate mock RoomMessage data
-		roomMessage := generateMockRoomMessage()
-
-		// Encode RoomMessage data to JSON
-		response, err := json.Marshal(roomMessage)
-		if err != nil {
-			log.Println("JSON marshal error:", err)
-			continue
-		}
-
-		// Send JSON data to client
-		if err = c.WriteMessage(websocket.TextMessage, response); err != nil {
-			log.Println("Write error:", err)
+	for {
+		select {
+		case <-ticker.C:
+			// Broadcast message every 5 seconds
+			log.Printf("broadcast loop from user %s to room %s\n", userID, roomID)
+			roomMessage := generateMockRoomMessage()
+			roomManager.BroadcastToRoom(roomID, roomMessage)
+		case <-done:
+			// Stop the ticker loop when the connection is closed
+			log.Printf("Stopping broadcast loop for user %s in room %s\n", userID, roomID)
 			return
 		}
-		log.Println("socket loop run")
 	}
-
 }
 
-
-// generateMockRoomMessage generates mock RoomMessage data
+// generateMockRoomMessage generates a mock message for testing purposes
 func generateMockRoomMessage() types.RoomMessage {
-	players := []types.Player{
-		{Name: "Alice", Ready: rand.Intn(2) == 1, ImgURL: "http://example.com/alice.jpg"},
-		{Name: "Bob", Ready: rand.Intn(2) == 1, ImgURL: "http://example.com/bob.jpg"},
-		{Name: "Charlie", Ready: rand.Intn(2) == 1, ImgURL: "http://example.com/charlie.jpg"},
-	}
-
 	return types.RoomMessage{
-		Players:      players,
+		Players:      []types.Player{{Name: "Test Player", Ready: true, ImgURL: "http://example.com/img.jpg"}},
 		MaxPlayers:   5,
-		PlayersCount: len(players),
-		Time:         rand.Intn(120), // Random time value
-		RoomPassword: "mockPassword",
-		RoomName:     "Mock Room",
+		PlayersCount: 1,
+		Time:         120,
+		RoomPassword: "secret",
+		RoomName:     "Room 1234",
 	}
 }
