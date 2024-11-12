@@ -1,0 +1,17 @@
+- Install dependencies
+go mod tidy
+
+- Running the Application
+go run main.go
+
+- Basic build (creates an executable in the current directory)
+go build
+
+- Build with specific output name
+go build -o myapp
+
+- Cross-compile for Linux from another OS
+GOOS=linux GOARCH=amd64 go build -o myapp-linux
+
+- Run without building a binary
+go run main.go

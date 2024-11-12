@@ -2,8 +2,8 @@
 package socketTest
 
 import (
-	"go-websocket-fiber/models/types"
-	"go-websocket-fiber/services/socket"
+	"LOOTERZ_backend/models/types"
+	"LOOTERZ_backend/services/socket"
 	"log"
 	"time"
 

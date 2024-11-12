@@ -1,8 +1,8 @@
 package routes
 
 import (
-	httpTest "go-websocket-fiber/controllers/http/test"
-	socketTest "go-websocket-fiber/controllers/socket/test"
+	httpTest "LOOTERZ_backend/controllers/http/test"
+	socketTest "LOOTERZ_backend/controllers/socket/test"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"

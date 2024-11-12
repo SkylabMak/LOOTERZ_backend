@@ -2,8 +2,8 @@
 package socket
 
 import (
+	"LOOTERZ_backend/models/types"
 	"encoding/json"
-	"go-websocket-fiber/models/types"
 	"log"
 	"sync"
 

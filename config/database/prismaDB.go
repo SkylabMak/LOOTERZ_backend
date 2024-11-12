@@ -1,7 +1,7 @@
 package config
 
 import (
-	"go-websocket-fiber/prisma/db"
+	"LOOTERZ_backend/prisma/db"
 	"log"
 )
 

@@ -1,12 +1,12 @@
 package httpTest
 
 import (
+	dbClient "LOOTERZ_backend/config/database"
+	"LOOTERZ_backend/models/modelsDB"
 	"context"
-	dbClient "go-websocket-fiber/config/database"
-	"go-websocket-fiber/models/modelsDB"
 
 	// "go-websocket-fiber/models"
-	"go-websocket-fiber/prisma/db"
+	"LOOTERZ_backend/prisma/db"
 	"log"
 
 	"github.com/gofiber/fiber/v2"

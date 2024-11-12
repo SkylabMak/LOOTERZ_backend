@@ -1,8 +1,8 @@
 package main
 
 import (
-	configDB "go-websocket-fiber/config/database"
-	"go-websocket-fiber/routes"
+	configDB "LOOTERZ_backend/config/database"
+	"LOOTERZ_backend/routes"
 
 	// "go-websocket-fiber/routes"
 	"log"
