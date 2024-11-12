@@ -1,0 +1,41 @@
+-- Create the database
+CREATE DATABASE IF NOT EXISTS LOOTERZ_db;
+USE LOOTERZ_db;
+
+-- Create the Room table with privateStatus as BOOLEAN
+CREATE TABLE Room (
+    roomID VARCHAR(20) PRIMARY KEY,
+    roomStatus INT NOT NULL,                -- 0 = not started, 1 = in progress
+    roomName VARCHAR(50) NOT NULL,          -- Room name
+    maxPlayerAmount INT CHECK (maxPlayerAmount BETWEEN 2 AND 7), -- Max players (2 to 7)
+    timePerTurn INT,                        -- Time per turn (in minutes)
+    privateStatus BOOLEAN,                  -- TRUE = private, FALSE = public
+    password VARCHAR(255)                   -- Password (MD5 hash if private)
+);
+
+-- Create the User table
+CREATE TABLE User (
+    UserID VARCHAR(20) PRIMARY KEY,         -- User ID
+    UserName VARCHAR(10) NOT NULL,          -- User name (max 10 characters)
+    head BOOLEAN DEFAULT 0,                 -- Whether user is room head or not
+    roomID VARCHAR(20),                     -- Foreign key to Room
+    FOREIGN KEY (roomID) REFERENCES Room(roomID)
+);
+
+-- Insert mock data into the Room table
+INSERT INTO Room (roomID, roomStatus, roomName, maxPlayerAmount, timePerTurn, privateStatus, password)
+VALUES 
+    ('room01', 0, 'Beginner Room', 4, 10, FALSE, NULL),
+    ('room02', 1, 'Advanced Room', 5, 20, TRUE, MD5('securepassword')),
+    ('room03', 0, 'Private Room', 3, 15, TRUE, MD5('private123'));
+
+-- Insert mock data into the User table
+INSERT INTO User (UserID, UserName, head, roomID)
+VALUES 
+    ('user01', 'Alice', TRUE, 'room01'),    -- Room head for room01
+    ('user02', 'Bob', FALSE, 'room01'),
+    ('user03', 'Charlie', FALSE, 'room01'),
+    ('user04', 'Dave', TRUE, 'room02'),     -- Room head for room02
+    ('user05', 'Eve', FALSE, 'room02'),
+    ('user06', 'Frank', FALSE, 'room03'),   -- Member of a private room (room03)
+    ('user07', 'Grace', TRUE, 'room03');    -- Room head for room03

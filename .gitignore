@@ -1,0 +1,56 @@
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Output of the go build command
+/go/bin/
+/bin/
+/build/
+
+# Temporary files
+*.out
+*.log
+
+# Environment variables file
+.env
+
+# Go modules
+/go/pkg/mod
+/go/pkg/sumdb
+
+# Dependency directories
+vendor/
+
+# Database and SQL
+*.sql
+*.db
+
+# MySQL Workbench files (optional if you use MySQL Workbench)
+*.mwb
+*.bak
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Editor-specific files
+.vscode/
+.idea/
+*.swp
+*~
+
+# JetBrains IDEs
+.idea/
+*.iml
+
+# MacOS
+.DS_Store
+
+# Linux temporary files
+*~
+
+# Windows temporary files
+Thumbs.db
+ehthumbs.db

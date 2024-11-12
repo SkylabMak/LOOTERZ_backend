@@ -1,0 +1,30 @@
+generator db {
+  provider = "go run github.com/steebchen/prisma-client-go"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL_SQL")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model room {
+  roomID          String   @id @db.VarChar(20)
+  roomStatus      Int
+  roomName        String   @db.VarChar(50)
+  maxPlayerAmount Int?
+  timePerTurn     Int?
+  privateStatus   Boolean?
+  password        String?  @db.VarChar(255)
+  user            user[]
+}
+
+model user {
+  UserID   String   @id @db.VarChar(20)
+  UserName String   @db.VarChar(10)
+  head     Boolean? @default(false)
+  roomID   String?  @db.VarChar(20)
+  room     room?    @relation(fields: [roomID], references: [roomID], onDelete: NoAction, onUpdate: NoAction, map: "user_ibfk_1")
+
+  @@index([roomID], map: "roomID")
+}
