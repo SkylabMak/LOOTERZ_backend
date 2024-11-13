@@ -3,6 +3,7 @@ package main
 import (
 	configDB "LOOTERZ_backend/config/database"
 	"LOOTERZ_backend/routes"
+	"LOOTERZ_backend/services/socket"
 
 	// "go-websocket-fiber/routes"
 	"log"
@@ -15,6 +16,7 @@ func main() {
 	// Initialize the database connection
 	configDB.InitDB()
 	configDB.InitPrismaDB()
+	socket.InitRedis()
 
 	// Initialize the Fiber app
 	app := fiber.New()

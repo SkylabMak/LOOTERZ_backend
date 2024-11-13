@@ -17,12 +17,18 @@ type RoomManager struct {
 }
 
 // globalRoomManager is a singleton instance of RoomManager
+// package-level variable that is initialized only once and shared across the program.
 var globalRoomManager = NewRoomManager()
 
+/*
+var ExportedVar = "I can be accessed from other packages"
+var unexportedVar = "I am only accessible within the example package"
+*/
 // NewRoomManager initializes and returns a RoomManager instance
 func NewRoomManager() *RoomManager {
 	return &RoomManager{
 		rooms: make(map[string]map[string]*websocket.Conn),
+		//The types slice, map, and channel require make because they are reference types that involve underlying data structures that need setup:
 	}
 }
 
@@ -33,6 +39,8 @@ func GetRoomManager() *RoomManager {
 
 // AddConnection adds a WebSocket connection for a specific user in a specific room
 func (rm *RoomManager) AddConnection(roomID, userID string, conn *websocket.Conn) {
+	//(rm *RoomManager) in Go is called a method receiver
+	//AddConnection becomes a method of RoomManager.
 	rm.mu.Lock()
 	defer rm.mu.Unlock()
 
@@ -57,7 +65,7 @@ func (rm *RoomManager) RemoveConnection(roomID, userID string) {
 	// Check if the room and user connection exist
 	if room, roomExists := rm.rooms[roomID]; roomExists {
 		if conn, userExists := room[userID]; userExists {
-			conn.Close() // Close the WebSocket connection
+			conn.Close()         // Close the WebSocket connection
 			delete(room, userID) // Remove the user’s connection from the room
 		}
 
@@ -96,4 +104,26 @@ func (rm *RoomManager) BroadcastToRoom(roomID string, message types.RoomMessage)
 			// rm.RemoveConnection(roomID, userID) -- if you keep track of userID here
 		}
 	}
+}
+
+// CheckRoomExists checks if a room with the given roomID exists
+func (rm *RoomManager) CheckRoomExists(roomID string) bool {
+	rm.mu.Lock()
+	defer rm.mu.Unlock()
+
+	_, exists := rm.rooms[roomID]
+	return exists
+}
+
+// CheckUserInRoom checks if a user with the given userID is in the specified room
+func (rm *RoomManager) CheckUserInRoom(roomID, userID string) bool {
+	rm.mu.Lock()
+	defer rm.mu.Unlock()
+
+	// Check if the room exists
+	if room, roomExists := rm.rooms[roomID]; roomExists {
+		_, userExists := room[userID]
+		return userExists
+	}
+	return false
 }
