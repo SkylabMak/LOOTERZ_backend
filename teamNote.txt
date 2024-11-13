@@ -3,5 +3,7 @@
 3. **สำคัญ**
 ในโปรเจคนี้มีการใช้ solution ให้เลือกมากกว่า 1 เช่น
 3.1 database เลือกทำทั้งคู่ตามความชอบหรืออยากลองทั้งคู่ก็ได้
-3.2 WebSocket ในนี้มีสองแบบคือ WebSocket และ redis *ให้ใส่ WebSocket นะ*
+3.2 WebSocket ในนี้มีสองแบบคือ WebSocket และ redis *ไม่ใช้ redis* ส่วน Socket.io ทำเองได้เลย มี template คร่าวๆใน service folder ให้แล้ว
 4. command ต่างๆรวมไปถึง Install dependencies อยู่ใน command.txt
+5. **สำคัญ**
+ในส่วนของ room_manager.go แก้ได้นะเต็มที่ ให้เหมาะกับการใช้
