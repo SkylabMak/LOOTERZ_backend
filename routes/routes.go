@@ -24,7 +24,7 @@ func SetupRoutes(app *fiber.App) {
 	
 	//httpListRoom game
 	listRoomGroup := app.Group("/listRoom")
-	listRoomGroup.Get("/getListRoom",httpListRoom.GetListRoom)
+	listRoomGroup.Get("/getListRoom/:page",httpListRoom.GetListRoom)
 	listRoomGroup.Get("/enterRoom",httpListRoom.EnterRoom)
 	
 	//httpLobby game

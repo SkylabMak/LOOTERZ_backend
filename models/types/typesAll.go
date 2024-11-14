@@ -15,3 +15,12 @@ type RoomMessage struct {
 	RoomPassword string   `json:"roomPassword"`
 	RoomName     string   `json:"roomName"`
 }
+
+type RoomResponse struct {
+	RoomName       string `json:"roomName"`
+	RoomID         string `json:"roomID"`
+	NumberPlayers  int    `json:"NumberPlayers"`
+	CurrentPlayers int    `json:"currentPlayes"`
+	Time           int    `json:"time"`
+	PrivateStatus  bool   `json:"privateStatus"`
+}
