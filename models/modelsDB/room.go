@@ -14,3 +14,8 @@ type Room struct {
 
 	Users []User `gorm:"foreignKey:RoomID" json:"users"`
 }
+
+// TableName overrides the default table name used by GORM
+func (Room) TableName() string {
+	return "Room" // Use "User" as the table name
+}

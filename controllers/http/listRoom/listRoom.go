@@ -2,6 +2,7 @@ package httpListRoom
 
 import (
 	gormDB "LOOTERZ_backend/config/database"
+	"LOOTERZ_backend/models/modelsDB"
 	"LOOTERZ_backend/models/types"
 	"LOOTERZ_backend/utils"
 	"log"
@@ -65,8 +66,8 @@ func GetListRoom(c *fiber.Ctx) error {
 
 func EnterRoom(c *fiber.Ctx) error {
 	var request struct {
-		Channel string `json:"channel"`
-		Message string `json:"message"`
+		RoomID string `json:"roomID"`
+		Password string `json:"password"`
 	}
 
 	token := c.Cookies("token")
@@ -80,5 +81,11 @@ func EnterRoom(c *fiber.Ctx) error {
 	if err := c.BodyParser(&request); err != nil {
 		return utils.ErrorResponse(c,400,utils.ErrBadReq   ,"Bad request","request body miss match")
 	}
-	return c.JSON(fiber.Map{})
+
+	var room modelsDB.Room
+	if err := gormDB.DB.First(&room, "roomID = ?", request.RoomID).Error; err != nil {
+		// Return an error if the room is not found
+		return utils.ErrorResponse(c, fiber.StatusNotFound, utils.ErrNotFound, "Room not found", "Room not found")
+	}
+	return c.JSON(room)
 }
