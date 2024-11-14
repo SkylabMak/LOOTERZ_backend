@@ -1,5 +1,7 @@
 package types
 
+type ErrorCode string
+
 type Player struct {
 	Name   string `json:"name"`
 	Ready  bool   `json:"ready"`

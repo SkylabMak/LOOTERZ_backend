@@ -31,7 +31,7 @@ func GetListRoom(c *fiber.Ctx) error {
 
 	log.Println(roomsWithCount)
 	if err != nil {
-		return utils.ErrorResponse(c,500,"Unable to retrieve rooms","someting Error")
+		return utils.ErrorResponse(c,500,utils.ErrInternal,"Unable to retrieve rooms","someting Error")
 	}
 
 	// Map results to RoomResponse struct
