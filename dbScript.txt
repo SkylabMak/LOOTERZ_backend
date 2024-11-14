@@ -34,12 +34,17 @@ VALUES
     ('room03', 0, 'Private Room', 3, 15, TRUE, MD5('private123'));
 
 -- Insert mock data into the User table
-INSERT INTO User (UserID, UserName, head, roomID)
+INSERT INTO User (UserID, UserName, head, imgID, roomID)
 VALUES 
-    ('user01', 'Alice', TRUE, 'room01'),    -- Room head for room01
-    ('user02', 'Bob', FALSE, 'room01'),
-    ('user03', 'Charlie', FALSE, 'room01'),
-    ('user04', 'Dave', TRUE, 'room02'),     -- Room head for room02
-    ('user05', 'Eve', FALSE, 'room02'),
-    ('user06', 'Frank', FALSE, 'room03'),   -- Member of a private room (room03)
-    ('user07', 'Grace', TRUE, 'room03');    -- Room head for room03
+    ('user01', 'Alice', TRUE,1, 'room01'),    -- Room head for room01
+    ('user02', 'Bob', FALSE,2, 'room01'),
+    ('user03', 'Charlie', FALSE,3, 'room01'),
+    ('user04', 'Dave', TRUE,1, 'room02'),     -- Room head for room02
+    ('user05', 'Eve', FALSE,3, 'room02'),
+    ('user06', 'Frank', FALSE,4, 'room03'),   -- Member of a private room (room03)
+    ('user07', 'Grace', TRUE,2, 'room03');    -- Room head for room03
+    -- Insert mock data into the User table
+
+INSERT INTO User (UserID, UserName, head)
+VALUES 
+    ('user08', 'Mek', FALSE);
