@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 func GetListRoom(c *fiber.Ctx) error {
@@ -28,7 +29,6 @@ func GetListRoom(c *fiber.Ctx) error {
 		CurrentPlayers  int
 	}
 
-	
 	err := gormDB.DB.Table("room").
 		Select("room.roomID, room.roomName, room.maxPlayerAmount, room.timePerTurn, room.privateStatus, COUNT(user.userID) AS current_players").
 		Joins("LEFT JOIN user ON user.roomID = room.roomID").
@@ -39,12 +39,10 @@ func GetListRoom(c *fiber.Ctx) error {
 		Offset(offset).
 		Find(&roomsWithCount).Error
 
-	
 	if err != nil {
 		return utils.FullErrorResponse(c, 500, utils.ErrInternal, "Unable to retrieve rooms", err)
 	}
 
-	
 	var responseRooms []types.RoomResponse
 	for _, room := range roomsWithCount {
 		responseRooms = append(responseRooms, types.RoomResponse{
@@ -57,7 +55,7 @@ func GetListRoom(c *fiber.Ctx) error {
 		})
 	}
 
-	if(responseRooms == nil){
+	if responseRooms == nil {
 		return c.JSON([]interface{}{})
 	}
 
@@ -66,7 +64,7 @@ func GetListRoom(c *fiber.Ctx) error {
 
 func EnterRoom(c *fiber.Ctx) error {
 	var request struct {
-		RoomID string `json:"roomID"`
+		RoomID   string `json:"roomID"`
 		Password string `json:"password"`
 	}
 
@@ -79,13 +77,67 @@ func EnterRoom(c *fiber.Ctx) error {
 	}
 
 	if err := c.BodyParser(&request); err != nil {
-		return utils.ErrorResponse(c,400,utils.ErrBadReq   ,"Bad request","request body miss match")
+		return utils.ErrorResponse(c, 400, utils.ErrBadReq, "Bad request", "request body miss match")
+	}
+
+	var user modelsDB.User
+	if err := gormDB.DB.First(&user, "UserID = ?", userID).Error; err != nil {
+		// Return an error if the room is not found
+		return utils.ErrorResponse(c, fiber.StatusNotFound, utils.ErrNotFound, "User not found", "User not found")
 	}
 
 	var room modelsDB.Room
-	if err := gormDB.DB.First(&room, "roomID = ?", request.RoomID).Error; err != nil {
-		// Return an error if the room is not found
+	err := gormDB.DB.Preload("Users", func(db *gorm.DB) *gorm.DB {
+		return db.Order("imgID ASC") // Sort users by ImgID in ascending order
+	}).First(&room, "roomID = ?", request.RoomID).Error
+	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusNotFound, utils.ErrNotFound, "Room not found", "Room not found")
 	}
-	return c.JSON(room)
+
+	log.Print(room)
+	if (room.PrivateStatus && (room.Password != request.Password) ) {
+		return c.JSON(fiber.Map{
+			"code": utils.ErrRoomPassword,
+			"pass": false,
+		})
+	}
+
+	if (room.RoomStatus == 1) {
+		log.Print("room.RoomStatus == 1")
+		return c.JSON(fiber.Map{
+			"code": utils.ErrMissCondition,
+			"pass": false,
+		})
+	}
+
+	
+	newImgId := 1
+
+	for index, user := range room.Users {
+		// Perform operations with user, e.g., print or modify fields
+		log.Printf("Processing UserID: %s, index: %d\n", user.UserID, index)
+		imgIDInt,_ := strconv.Atoi(user.ImgID)
+		if(index+1 != imgIDInt){
+			log.Printf("found at %d",index)
+			newImgId = index+1
+			break
+		}
+		newImgId = index+2
+	}
+
+	
+
+	user.ImgID = strconv.Itoa(newImgId)
+	user.RoomID = room.RoomID
+	user.Ready = false
+	if err := gormDB.DB.Save(&user).Error; err != nil {
+		return utils.ErrorResponse(c, fiber.StatusInternalServerError, utils.ErrInternal, "Unable to update user", "Unable to update user to join room")
+	}
+	log.Print(user)
+	//UPDATE User SET ImgID = NULL, RoomID = NULL WHERE UserID = "user08";
+
+	return c.JSON(fiber.Map{
+		"code": "200",
+		"pass": true,
+	})
 }

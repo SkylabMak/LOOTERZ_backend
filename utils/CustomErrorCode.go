@@ -14,6 +14,7 @@ const (
 	ErrMissCondition types.ErrorCode = "461"
 	ErrNotFound types.ErrorCode = "462"
 
-	//
+	//room
+	ErrRoomPassword types.ErrorCode = "601"
 	
 )

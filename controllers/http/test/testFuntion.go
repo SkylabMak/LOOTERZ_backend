@@ -12,7 +12,7 @@ func TestFuntion(c *fiber.Ctx) error {
 	token := c.Cookies("token")
 	log.Printf("Token cookie: %s\n", token)
 
-	testUser, _ := utils.GenerateJWT("user06")
+	testUser, _ := utils.GenerateJWT("user08")
 	log.Printf("encrypt  %s\n", testUser)
 	userID, _ := utils.DecodeJWT(testUser)
 	log.Printf("decrypt Token cookie: %s\n", userID)
