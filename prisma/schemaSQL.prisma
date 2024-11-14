@@ -24,6 +24,8 @@ model user {
   UserName String   @db.VarChar(10)
   head     Boolean? @default(false)
   roomID   String?  @db.VarChar(20)
+  imgID    String?  @db.VarChar(10)
+  ready    Boolean? @default(false)
   room     room?    @relation(fields: [roomID], references: [roomID], onDelete: NoAction, onUpdate: NoAction, map: "user_ibfk_1")
 
   @@index([roomID], map: "roomID")

@@ -22,6 +22,10 @@ CREATE TABLE User (
     FOREIGN KEY (roomID) REFERENCES Room(roomID)
 );
 
+ALTER TABLE user
+ADD COLUMN imgID VARCHAR(10),
+ADD COLUMN ready BOOLEAN DEFAULT FALSE;
+
 -- Insert mock data into the Room table
 INSERT INTO Room (roomID, roomStatus, roomName, maxPlayerAmount, timePerTurn, privateStatus, password)
 VALUES 
