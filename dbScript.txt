@@ -26,6 +26,8 @@ ALTER TABLE user
 ADD COLUMN imgID VARCHAR(10),
 ADD COLUMN ready BOOLEAN DEFAULT FALSE;
 
+ALTER TABLE room ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 -- Insert mock data into the Room table
 INSERT INTO Room (roomID, roomStatus, roomName, maxPlayerAmount, timePerTurn, privateStatus, password)
 VALUES 

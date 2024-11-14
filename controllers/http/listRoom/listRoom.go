@@ -4,14 +4,19 @@ import (
 	gormDB "LOOTERZ_backend/config/database"
 	"LOOTERZ_backend/models/types"
 	"LOOTERZ_backend/utils"
-	"log"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func GetListRoom(c *fiber.Ctx) error {
-	// page := c.Params("page")
+	page, errPage := strconv.Atoi(c.Params("page"))
 	// Define a slice to hold the rooms with user count
+	if errPage != nil || page < 1 {
+		page = 1
+	}
+	const limit = 20
+	offset := (page - 1) * limit
 	var roomsWithCount []struct {
 		RoomID          string `gorm:"primaryKey;column:roomID" `
 		RoomName        string `gorm:"column:roomName"`
@@ -27,11 +32,14 @@ func GetListRoom(c *fiber.Ctx) error {
 		Joins("LEFT JOIN user ON user.roomID = room.roomID").
 		Where("room.roomID LIKE ?", "room%").
 		Group("room.roomID").
+		Order("room.created_at DESC"). // Order by creation date
+		Limit(limit).
+		Offset(offset).
 		Find(&roomsWithCount).Error
 
-	log.Println(roomsWithCount)
+	// log.Println(roomsWithCount)
 	if err != nil {
-		return utils.FullErrorResponse(c,500,utils.ErrInternal,"Unable to retrieve rooms",err)
+		return utils.FullErrorResponse(c, 500, utils.ErrInternal, "Unable to retrieve rooms", err)
 	}
 
 	// Map results to RoomResponse struct
@@ -45,6 +53,10 @@ func GetListRoom(c *fiber.Ctx) error {
 			Time:           room.TimePerTurn,
 			PrivateStatus:  room.PrivateStatus,
 		})
+	}
+
+	if(responseRooms == nil){
+		return c.JSON([]interface{}{})
 	}
 
 	return c.JSON(responseRooms)
