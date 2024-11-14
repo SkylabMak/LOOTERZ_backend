@@ -11,7 +11,7 @@ import (
 
 func GetListRoom(c *fiber.Ctx) error {
 	page, errPage := strconv.Atoi(c.Params("page"))
-	// Define a slice to hold the rooms with user count
+
 	if errPage != nil || page < 1 {
 		page = 1
 	}
@@ -26,23 +26,23 @@ func GetListRoom(c *fiber.Ctx) error {
 		CurrentPlayers  int
 	}
 
-	// Query to join Room and User tables, counting user per room
+	
 	err := gormDB.DB.Table("room").
 		Select("room.roomID, room.roomName, room.maxPlayerAmount, room.timePerTurn, room.privateStatus, COUNT(user.userID) AS current_players").
 		Joins("LEFT JOIN user ON user.roomID = room.roomID").
 		Where("room.roomID LIKE ?", "room%").
 		Group("room.roomID").
-		Order("room.created_at DESC"). // Order by creation date
+		Order("room.created_at DESC").
 		Limit(limit).
 		Offset(offset).
 		Find(&roomsWithCount).Error
 
-	// log.Println(roomsWithCount)
+	
 	if err != nil {
 		return utils.FullErrorResponse(c, 500, utils.ErrInternal, "Unable to retrieve rooms", err)
 	}
 
-	// Map results to RoomResponse struct
+	
 	var responseRooms []types.RoomResponse
 	for _, room := range roomsWithCount {
 		responseRooms = append(responseRooms, types.RoomResponse{
@@ -63,6 +63,20 @@ func GetListRoom(c *fiber.Ctx) error {
 }
 
 func EnterRoom(c *fiber.Ctx) error {
+	var request struct {
+		Channel string `json:"channel"`
+		Message string `json:"message"`
+	}
 
+	token := c.Cookies("token")
+	userID, errorToken := utils.DecodeJWT(token)
+	// Check if there was an error decoding the JWT token
+	if errorToken != nil {
+		return utils.ErrorResponse(c, fiber.StatusUnauthorized, utils.ErrUnauthorized, "Invalid or expired token", errorToken)
+	}
+
+	if err := c.BodyParser(&request); err != nil {
+		return utils.ErrorResponse(c,400,utils.ErrBadReq   ,"Bad request","request body miss match")
+	}
 	return c.JSON(fiber.Map{})
 }
