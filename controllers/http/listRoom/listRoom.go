@@ -4,6 +4,7 @@ import (
 	gormDB "LOOTERZ_backend/config/database"
 	"LOOTERZ_backend/models/types"
 	"LOOTERZ_backend/utils"
+	"log"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -71,8 +72,9 @@ func EnterRoom(c *fiber.Ctx) error {
 	token := c.Cookies("token")
 	userID, errorToken := utils.DecodeJWT(token)
 	// Check if there was an error decoding the JWT token
+	log.Print(userID)
 	if errorToken != nil {
-		return utils.ErrorResponse(c, fiber.StatusUnauthorized, utils.ErrUnauthorized, "Invalid or expired token", errorToken)
+		return utils.ErrorResponse(c, fiber.StatusUnauthorized, utils.ErrBadReq, "Invalid or expired token", "Invalid or expired token")
 	}
 
 	if err := c.BodyParser(&request); err != nil {
