@@ -13,8 +13,10 @@ func SetCookie(c *fiber.Ctx, name, value string, expires time.Duration) {
 		Name:     name,
 		Value:    value,
 		Expires:  time.Now().Add(expires),
-		HTTPOnly: true,       // Secure the cookie so it's only accessible via HTTP
-		SameSite: "Strict",   // Optional: SameSite attribute to control cross-site behavior
+		SameSite: "None",
+		HTTPOnly: true,
+		Secure:   true, 
+		Path: "/",
 	})
 }
 

@@ -9,10 +9,19 @@ import (
 	socketTest "LOOTERZ_backend/controllers/socket/test"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/websocket/v2"
 )
 
 func SetupRoutes(app *fiber.App) {
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     "http://localhost:3000,http://localhost:3001", // Specify your frontend's origin
+		AllowMethods:     "GET,POST,OPTIONS",
+		AllowHeaders:     "Origin, Content-Type, Accept, credentials", // Include "credentials" here
+		AllowCredentials: true,
+	}))
+	
+	
 	// HTTP endpoint test
 	app.Post("/testGetAllUser", httpTest.TestGetAllUser)
 	app.Post("/testGetAllUserGROM", httpTest.TestGetAllUser)

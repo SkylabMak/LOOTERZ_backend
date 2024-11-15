@@ -13,6 +13,7 @@ const (
 	// custom error code
 	ErrMissCondition types.ErrorCode = "461"
 	ErrNotFound types.ErrorCode = "462"
+	ErrContentType types.ErrorCode = "499"
 
 	//room
 	ErrRoomPassword types.ErrorCode = "601"
