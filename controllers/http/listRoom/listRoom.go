@@ -64,7 +64,7 @@ func GetListRoom(c *fiber.Ctx) error {
 }
 
 func EnterRoom(c *fiber.Ctx) error {
-	if !security.SanitizeJSONBody(c) {
+	if !security.DetectSanitizeJSONBody(c) {
 		return utils.ErrorResponse(c, 400, utils.ErrContentType, "Err Content Type", "Content Type must be application/json")
 	}
 	var request struct {
@@ -73,7 +73,8 @@ func EnterRoom(c *fiber.Ctx) error {
 		Token   string `json:"token"`
 	}
 
-	token := c.Cookies("token")
+	// token := c.Cookies("token")
+	token := request.Token
 	userID, errorToken := utils.DecodeJWT(token)
 	// Check if there was an error decoding the JWT token
 	log.Print(userID)
