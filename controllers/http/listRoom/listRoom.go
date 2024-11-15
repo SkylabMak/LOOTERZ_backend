@@ -14,6 +14,16 @@ import (
 )
 
 func GetListRoom(c *fiber.Ctx) error {
+	// Log request details
+	log.Print("Request Source:")
+	log.Printf(" - IP: %s", c.IP())                      // Log the client's IP address
+	log.Printf(" - Hostname: %s", c.Hostname())          // Log the hostname
+	log.Printf(" - Method: %s", c.Method())              // Log the HTTP method
+	log.Printf(" - User-Agent: %s", c.Get("User-Agent")) // Log the user-agent header
+	log.Printf(" - URL Path: %s", c.Path())              // Log the request path
+
+	token := c.Cookies("token")
+	log.Print("token in GetListRoom : ", token)
 	page, errPage := strconv.Atoi(c.Params("page"))
 
 	if errPage != nil || page < 1 {
@@ -70,12 +80,15 @@ func EnterRoom(c *fiber.Ctx) error {
 	var request struct {
 		RoomID   string `json:"roomID"`
 		Password string `json:"password"`
-		Token   string `json:"token"`
+		Token    string `json:"token"`
 	}
 
+	tokenCookie := c.Cookies("token")
+	log.Print("token in EnterRoom : ", tokenCookie)
+
 	// token := c.Cookies("token")
-	token := request.Token
-	userID, errorToken := utils.DecodeJWT(token)
+	// token := request.Token
+	userID, errorToken := utils.DecodeJWT(tokenCookie)
 	// Check if there was an error decoding the JWT token
 	log.Print(userID)
 	if errorToken != nil {
@@ -101,41 +114,39 @@ func EnterRoom(c *fiber.Ctx) error {
 	}
 
 	log.Print(room)
-	if (room.PrivateStatus && (room.Password != request.Password) ) {
+	if room.PrivateStatus && (room.Password != request.Password) {
 		return c.JSON(fiber.Map{
 			"code": utils.ErrRoomPassword,
 			"pass": false,
 		})
 	}
 
-	if (room.RoomStatus == 1) {
-		log.Print("room.RoomStatus == 1")
-		return c.JSON(fiber.Map{
-			"code": utils.ErrMissCondition,
-			"pass": false,
-		})
-	}
+	// if (room.RoomStatus == 1) {
+	// 	log.Print("room.RoomStatus == 1")
+	// 	return c.JSON(fiber.Map{
+	// 		"code": utils.ErrMissCondition,
+	// 		"pass": false,
+	// 	})
+	// }
 
-	
 	newImgId := 1
 
 	for index, user := range room.Users {
 		// Perform operations with user, e.g., print or modify fields
 		log.Printf("Processing UserID: %s, index: %d\n", user.UserID, index)
-		imgIDInt,_ := strconv.Atoi(user.ImgID)
-		if(index+1 != imgIDInt){
-			log.Printf("found at %d",index)
-			newImgId = index+1
+		imgIDInt, _ := strconv.Atoi(user.ImgID)
+		if index+1 != imgIDInt {
+			log.Printf("found at %d", index)
+			newImgId = index + 1
 			break
 		}
-		newImgId = index+2
+		newImgId = index + 2
 	}
-
-	
 
 	user.ImgID = strconv.Itoa(newImgId)
 	user.RoomID = room.RoomID
 	user.Ready = false
+	log.Print("new data User", user)
 	if err := gormDB.DB.Save(&user).Error; err != nil {
 		return utils.ErrorResponse(c, fiber.StatusInternalServerError, utils.ErrInternal, "Unable to update user", "Unable to update user to join room")
 	}

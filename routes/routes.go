@@ -15,7 +15,7 @@ import (
 
 func SetupRoutes(app *fiber.App) {
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:3000,http://localhost:3001", // Specify your frontend's origin
+		AllowOrigins:     "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001", // Specify your frontend's origin
 		AllowMethods:     "GET,POST,OPTIONS",
 		AllowHeaders:     "Origin, Content-Type, Accept, credentials", // Include "credentials" here
 		AllowCredentials: true,
@@ -50,4 +50,8 @@ func SetupRoutes(app *fiber.App) {
 	//test
 	app.Get("/ws/:roomID", websocket.New(socketTest.WebSocketHandler))
 	app.Get("/ws/reids/:roomID", websocket.New(socketTest.WebSocketHandler_redis))
+	// app.Listen("localhost:8080")
+	app.Listen("http://127.0.0.1:8080")
+	// app.Listen(":8080") // Binds to all available interfaces (IPv4 and IPv6)
+
 }
