@@ -5,6 +5,7 @@ import (
 	"LOOTERZ_backend/models/modelsDB"
 	"LOOTERZ_backend/models/types"
 	"LOOTERZ_backend/utils"
+	"LOOTERZ_backend/utils/security"
 	"log"
 	"strconv"
 
@@ -63,9 +64,13 @@ func GetListRoom(c *fiber.Ctx) error {
 }
 
 func EnterRoom(c *fiber.Ctx) error {
+	if !security.SanitizeJSONBody(c) {
+		return utils.ErrorResponse(c, 400, utils.ErrContentType, "Err Content Type", "Content Type must be application/json")
+	}
 	var request struct {
 		RoomID   string `json:"roomID"`
 		Password string `json:"password"`
+		Token   string `json:"token"`
 	}
 
 	token := c.Cookies("token")

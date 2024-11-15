@@ -27,7 +27,7 @@ func TestFuntion(c *fiber.Ctx) error {
 }
 
 func TestFuntion02(c *fiber.Ctx) error {
-	if !security.CheckContentJSONType(c) {
+	if !security.DetectSanitizeJSONBody(c) {
 		return utils.ErrorResponse(c, 400, utils.ErrContentType, "Err Content Type", "Content Type must be application/json")
 	}
 	var request struct {

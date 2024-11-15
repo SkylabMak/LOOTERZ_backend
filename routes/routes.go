@@ -26,6 +26,7 @@ func SetupRoutes(app *fiber.App) {
 	app.Post("/testGetAllUser", httpTest.TestGetAllUser)
 	app.Post("/testGetAllUserGROM", httpTest.TestGetAllUser)
 	app.Get("/testFunction", httpTest.TestFuntion)
+	app.Post("/testFunction02", httpTest.TestFuntion02)
 	app.Post("/testSendReids", httpTest.SendMessageHandler)
 	// HTTP endpoint
 	//httpHome ball
