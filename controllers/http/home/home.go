@@ -59,14 +59,9 @@ func Enter(c *fiber.Ctx) error {
 
 func EnterCheckStatus(c *fiber.Ctx) error {
 
-	cookie := c.Cookies("token")
-	if cookie == "" {
-		return utils.ErrorResponse(c, fiber.StatusUnauthorized, "401", "Unautorized", "Failed to Authorization")
-
-	}
-	userId, err := utils.DecodeJWT(cookie)
+	userId, err := utils.Auth(c)
 	if err != nil {
-		return utils.ErrorResponse(c, fiber.StatusInternalServerError, utils.ErrInternal, "Decode JWT Error", "Failed to decoding jwt")
+		return utils.ErrorResponse(c, fiber.StatusUnauthorized, "401", "Unauthorized", "Failed to authorization")
 	}
 
 	status, err := checkUserInRoom(userId)
